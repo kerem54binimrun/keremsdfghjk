@@ -1,0 +1,107 @@
+!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobil Zıplama Oyunu</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            max-width: 420px;
+            height: 80vh;
+            max-height: 700px;
+        }
+        canvas {
+            background: #1e1e2f;
+            border-radius: 16px;
+            width: 100%;
+            height: 100%;
+            display: block;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .tap-hint {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+    <div class="tap-hint">Zıplamak için ekrana dokun!</div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Mobil ekran çözünürlük ayarı
+        function resize() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        // Değişkenler
+        let score = 0;
+        let isGameOver = false;
+        let gameStarted = false; // Başlangıç ekranı için
+
+        let player = {
+            x: 50,
+            y: 0,
+            size: 30,
+            dy: 0,
+            jumpPower: -12,
+            gravity: 0.6,
+            grounded: false,
+            color: "#ff4757"
+        };
+
+        let obstacle = {
+            x: 0,
+            y: 0,
+            size: 25,
+            speed: 5,
+            color: "#ffa502"
+        };
+
+        function resetGame() {
+            score = 0;
+            obstacle.speed = 5;
+            obstacle.x = canvas.width + 50;
+            player.y = canvas.height - 80 - player.size;
+            player.dy = 0;
+            isGameOver = false;
+        }
+
+        // Dokunma (Touch) Kontrolü
+        function handleTouch(e) {
+            e.preventDefault();
+            if (!gameStarted) {
+                gameStarted = true;
